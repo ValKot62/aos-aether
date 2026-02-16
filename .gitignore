@@ -1,0 +1,16 @@
+# OS
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+
+# Archives
+*.zip
+*.7z
+
+# Hash files
+*.sha256
