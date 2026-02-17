@@ -1,0 +1,128 @@
+openapi: 3.0.3
+
+info:
+  title: AOS External Agent Interface
+  description: Єдиний контракт взаємодії для всіх зовнішніх агентів.
+  version: 2.0.0
+
+servers:
+  - url: https://api.aos.local
+    description: Core Gateway
+
+tags:
+  - name: session
+    description: Управління сесією агента
+  - name: message
+    description: Обмін повідомленнями
+  - name: context
+    description: Отримання контексту
+
+paths:
+
+  /session/start:
+    post:
+      tags: [session]
+      summary: Запуск сесії агента
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStartRequest'
+      responses:
+        "200":
+          description: Сесію створено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStartResponse'
+
+  /message/send:
+    post:
+      tags: [message]
+      summary: Надіслати повідомлення в ядро
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+      responses:
+        "200":
+          description: Відповідь ядра
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /context/get:
+    get:
+      tags: [context]
+      summary: Отримати системний контекст
+      parameters:
+        - name: session_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Контекст
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextResponse'
+
+components:
+
+  schemas:
+
+    SessionStartRequest:
+      type: object
+      required: [agent_id, agent_type]
+      properties:
+        agent_id:
+          type: string
+        agent_type:
+          type: string
+          description: Тип агента (llm, service, app)
+        capabilities:
+          type: array
+          items:
+            type: string
+
+    SessionStartResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        status:
+          type: string
+
+    MessageRequest:
+      type: object
+      required: [session_id, role, content]
+      properties:
+        session_id:
+          type: string
+        role:
+          type: string
+          description: user | agent | system
+        content:
+          type: string
+
+    MessageResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+        metadata:
+          type: object
+
+    ContextResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        state:
+          type: object
